@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Urban Mobility Explorer | NYC Taxi Data</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="1" y="10" width="22" height="9" rx="2" />
+        <path d="M5 10V7a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v3" />
+        <circle cx="7" cy="19" r="2" />
+        <circle cx="17" cy="19" r="2" />
+      </svg>
+      <h1>Urban Mobility <span>Explorer</span></h1>
+    </div>
+    <div class="navbar-right">
+      <div class="status-badge" id="status-badge">
+        <div class="status-dot" id="status-dot"></div>
+        <span id="status-text">Connecting</span>
+      </div>
+    </div>
+  </nav>
+
+  <main class="main-wrapper">
+    <div class="page-header">
+      <h2>NYC Yellow Taxi — Trip Analytics Dashboard</h2>
+      <p>January 2019 • Explore patterns by date, borough, fare, and distance</p>
+    </div>
+
+    <!-- Filter Panel -->
+    <section class="filter-panel">
+      <div class="filter-panel-header">
+        <h3>Filter Data</h3>
+      </div>
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label for="filter-start-date">Start Date</label>
+          <input type="date" id="filter-start-date" value="2019-01-01" />
+        </div>
+        <div class="filter-group">
+          <label for="filter-end-date">End Date</label>
+          <input type="date" id="filter-end-date" value="2019-01-31" />
+        </div>
+        <div class="filter-group">
+          <label for="filter-borough">Pickup Borough</label>
+          <select id="filter-borough">
+            <option value="">All Boroughs</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label for="filter-min-fare">Min Fare ($)</label>
+          <input type="number" id="filter-min-fare" placeholder="e.g. 5" min="0" step="0.5" />
+        </div>
+        <div class="filter-group">
+          <label for="filter-max-fare">Max Fare ($)</label>
+          <input type="number" id="filter-max-fare" placeholder="e.g. 100" min="0" step="0.5" />
+        </div>
+        <div class="filter-group">
+          <label for="filter-min-distance">Min Distance (mi)</label>
+          <input type="number" id="filter-min-distance" placeholder="e.g. 1" min="0" step="0.1" />
+        </div>
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-secondary" id="btn-reset" onclick="resetFilters()">Reset</button>
+        <button class="btn btn-primary" id="btn-apply" onclick="applyFilters()">Apply Filters</button>
+      </div>
+    </section>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-card card-blue">
+        <div class="stat-label">Total Trips</div>
+        <div class="stat-value" id="stat-total-trips">—</div>
+      </div>
+      <div class="stat-card card-green">
+        <div class="stat-label">Avg Fare</div>
+        <div class="stat-value" id="stat-avg-fare">—</div>
+      </div>
+      <div class="stat-card card-orange">
+        <div class="stat-label">Avg Distance</div>
+        <div class="stat-value" id="stat-avg-distance">—</div>
+      </div>
+      <div class="stat-card card-purple">
+        <div class="stat-label">Avg Speed</div>
+        <div class="stat-value" id="stat-avg-speed">—</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="section-header">
+      <h2>Analytics Charts</h2>
+    </div>
+
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Trips per Hour</h3>
+        </div>
+        <canvas id="chart-hourly"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Revenue by Borough</h3>
+        </div>
+        <canvas id="chart-revenue"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Avg Fare by Distance</h3>
+        </div>
+        <canvas id="chart-fare"></canvas>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-header">
+          <h3>Top 10 Revenue Zones</h3>
+        </div>
+        <canvas id="chart-zones"></canvas>
+      </div>
+    </div>
+
+    <!-- Trip Records Table -->
+    <div class="section-header">
+      <h2>Trip Records</h2>
+    </div>
+
+    <div class="table-section">
+      <div class="table-wrapper">
+        <table id="trips-table">
+          <thead>
+            <tr>
+              <th>Pickup Time</th>
+              <th>Pickup Zone</th>
+              <th>Dropoff Zone</th>
+              <th>Borough</th>
+              <th>Distance</th>
+              <th>Fare</th>
+              <th>Total</th>
+              <th>Duration</th>
+            </tr>
+          </thead>
+          <tbody id="trips-tbody">
+            <tr><td colspan="8">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn btn-sm" id="btn-prev" onclick="changePage(-1)" disabled>Prev</button>
+        <span id="page-display">Page 1</span>
+        <button class="btn btn-sm" id="btn-next" onclick="changePage(1)" disabled>Next</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>Urban Mobility Explorer — NYC Yellow Taxi Dataset (January 2019)</p>
+  </footer>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
