@@ -5,7 +5,7 @@ data/yellow_cleaned_tripdata.csv
 __pycache__/
 *.pyc
 *.pyo
-database/db_config.py
+database/config.py
 certs/
 .vscode/
 .DS_Store

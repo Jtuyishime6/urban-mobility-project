@@ -2,13 +2,7 @@
 import csv
 import mysql.connector
 from datetime import datetime, timedelta
-
-DB_CONFIG = {
-    "host":     "localhost",
-    "user":     "root",
-    "password": "yourpassword",   
-    "database": "urban_mobility",
-}
+from config import DB_CONFIG
 
 TRIP_DATA_FILE = "data/yellow_cleaned_tripdata.csv"  
 
