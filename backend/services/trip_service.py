@@ -6,7 +6,7 @@ Handles filtered trip queries
 
 from typing import Dict, Any, Optional
 import mysql.connector
-from app.database import get_db_connection
+from database import get_db_connection
 
 
 def get_filtered_trips(
