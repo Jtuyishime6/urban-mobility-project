@@ -10,7 +10,7 @@ DB_CONFIG = {
     "database": "urban_mobility",
 }
 
-TRIP_DATA_FILE = "yellow_tripdata_2019.csv"  
+TRIP_DATA_FILE = "data/yellow_cleaned_tripdata.csv"  
 
 MIN_DISTANCE    = 0.0          
 MAX_DISTANCE    = 200.0        
