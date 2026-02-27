@@ -716,5 +716,4 @@ This project is for educational purposes as part of a university assignment.
 ## Acknowledgments
 
 - **NYC TLC** for providing open taxi trip data
-- **Team Members** for collaboration and execution
-- **Instructors** for guidance and feedback
+- **Developer** Jean de Dieu Tuyishime
