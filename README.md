@@ -8,7 +8,7 @@ An enterprise-level full-stack application for analyzing NYC taxi trip data from
 
 ## VIDEO LINK
 
-[Watch Here]([Video](https://youtu.be/Fup0RQvUxkk))
+[Watch Here](https://youtu.be/Fup0RQvUxkk)
 
 
 ## Project Overview
