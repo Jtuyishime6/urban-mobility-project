@@ -6,13 +6,13 @@ Connects to MySQL database and provides analytics endpoints
 
 from typing import List, Dict, Any
 import mysql.connector
-from app.algorithms import (
+from algorithms import (
     rank_zones_by_revenue,
     get_top_pickup_hours,
     group_trips_by_key,
     detect_anomalies
 )
-from app.database import get_db_connection
+from database import get_db_connection
 
 
 def get_hourly_demand() -> List[Dict[str, Any]]:
