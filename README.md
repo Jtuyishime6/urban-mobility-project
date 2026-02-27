@@ -7,7 +7,8 @@ An enterprise-level full-stack application for analyzing NYC taxi trip data from
 ---
 
 ## VIDEO LINK
-[Watch Here](https://your-video-link.com)
+
+[Watch Here]([Video](https://youtu.be/Fup0RQvUxkk))
 
 
 ## Project Overview
@@ -621,9 +622,7 @@ urban-mobility-data-explorer/
 
 ## Video Walkthrough
 
-**Link:** [Add your video link here]
-
-**Duration:** 5 minutes
+**Link:** [https://youtu.be/Fup0RQvUxkk]
 
 **Contents:**
 1. System architecture overview
