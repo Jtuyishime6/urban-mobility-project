@@ -6,13 +6,13 @@ Connects to MySQL database and provides analytics endpoints
 
 from typing import List, Dict, Any
 import mysql.connector
-from algorithms import (
+from app.algorithms import (
     rank_zones_by_revenue,
     get_top_pickup_hours,
     group_trips_by_key,
     detect_anomalies
 )
-from database import get_db_connection
+from app.database import get_db_connection
 
 
 def get_hourly_demand() -> List[Dict[str, Any]]:
@@ -70,7 +70,10 @@ def get_revenue_by_zone() -> List[Dict[str, Any]]:
     
     # Convert Decimal to float for JSON serialization
     for row in result:
-        row['total_revenue'] = float(row['total_revenue'])
+        if row['total_revenue'] is not None:
+            row['total_revenue'] = float(row['total_revenue'])
+        else:
+            row['total_revenue'] = 0.0
     
     return result
 
@@ -115,7 +118,10 @@ def get_avg_fare_per_distance() -> List[Dict[str, Any]]:
     
     # Convert Decimal to float
     for row in result:
-        row['avg_fare'] = float(row['avg_fare'])
+        if row['avg_fare'] is not None:
+            row['avg_fare'] = float(row['avg_fare'])
+        else:
+            row['avg_fare'] = 0.0
     
     return result
 
@@ -148,7 +154,10 @@ def get_top_revenue_zones(top_n: int = 10) -> List[Dict[str, Any]]:
     
     # Convert Decimal to float
     for row in result:
-        row['total_revenue'] = float(row['total_revenue'])
+        if row['total_revenue'] is not None:
+            row['total_revenue'] = float(row['total_revenue'])
+        else:
+            row['total_revenue'] = 0.0
     
     # Use custom merge sort algorithm
     sorted_zones = rank_zones_by_revenue(result)
