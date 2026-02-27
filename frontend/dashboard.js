@@ -111,7 +111,17 @@ async function loadHourlyChart() {
 async function loadRevenueChart() {
   try {
     const response = await fetch(`${API_BASE}/analytics/revenue-by-zone`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
     const result = await response.json();
+    
+    if (!result.data || result.data.length === 0) {
+      console.warn('No revenue data available');
+      return;
+    }
     
     const ctx = document.getElementById('chart-revenue').getContext('2d');
     
@@ -122,7 +132,7 @@ async function loadRevenueChart() {
       data: {
         labels: result.data.map(d => d.borough_name),
         datasets: [{
-          data: result.data.map(d => d.total_revenue),
+          data: result.data.map(d => parseFloat(d.total_revenue) || 0),
           backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4']
         }]
       },
@@ -140,7 +150,17 @@ async function loadRevenueChart() {
 async function loadFareChart() {
   try {
     const response = await fetch(`${API_BASE}/analytics/average-fare-per-mile`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
     const result = await response.json();
+    
+    if (!result.data || result.data.length === 0) {
+      console.warn('No fare data available');
+      return;
+    }
     
     const ctx = document.getElementById('chart-fare').getContext('2d');
     
@@ -152,7 +172,7 @@ async function loadFareChart() {
         labels: result.data.map(d => d.distance_group),
         datasets: [{
           label: 'Avg Fare ($)',
-          data: result.data.map(d => d.avg_fare),
+          data: result.data.map(d => parseFloat(d.avg_fare) || 0),
           borderColor: '#10b981',
           backgroundColor: 'rgba(16, 185, 129, 0.1)',
           fill: true,
@@ -173,7 +193,17 @@ async function loadFareChart() {
 async function loadZonesChart() {
   try {
     const response = await fetch(`${API_BASE}/analytics/top-revenue-zones?n=10`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    
     const result = await response.json();
+    
+    if (!result.data || result.data.length === 0) {
+      console.warn('No zones data available');
+      return;
+    }
     
     const ctx = document.getElementById('chart-zones').getContext('2d');
     
@@ -185,7 +215,7 @@ async function loadZonesChart() {
         labels: result.data.map(d => d.zone_name),
         datasets: [{
           label: 'Revenue ($)',
-          data: result.data.map(d => d.total_revenue),
+          data: result.data.map(d => parseFloat(d.total_revenue) || 0),
           backgroundColor: '#8b5cf6'
         }]
       },
@@ -205,7 +235,12 @@ async function loadZonesChart() {
 
 // Load trips table
 async function loadTrips(page = 1) {
+  const tbody = document.getElementById('trips-tbody');
+  
   try {
+    // Show loading state
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading trips...</td></tr>';
+    
     const params = new URLSearchParams({
       page: page,
       limit: 50,
@@ -213,27 +248,41 @@ async function loadTrips(page = 1) {
     });
     
     const response = await fetch(`${API_BASE}/trips?${params}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const result = await response.json();
     
-    const tbody = document.getElementById('trips-tbody');
     tbody.innerHTML = '';
     
-    if (result.data.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8">No trips found</td></tr>';
+    if (!result.data || result.data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No trips found</td></tr>';
+      document.getElementById('btn-prev').disabled = true;
+      document.getElementById('btn-next').disabled = true;
       return;
     }
     
     result.data.forEach(trip => {
       const row = document.createElement('tr');
+      
+      // Helper function to safely format numbers
+      const formatNum = (val, decimals = 2) => {
+        if (val === null || val === undefined || val === '') return 'N/A';
+        const num = parseFloat(val);
+        return isNaN(num) ? 'N/A' : num.toFixed(decimals);
+      };
+      
       row.innerHTML = `
         <td>${new Date(trip.pickup_datetime).toLocaleString()}</td>
-        <td>${trip.pickup_zone}</td>
-        <td>${trip.dropoff_zone}</td>
-        <td>${trip.pickup_borough}</td>
-        <td>${trip.trip_distance.toFixed(2)} mi</td>
-        <td>$${trip.fare_amount.toFixed(2)}</td>
-        <td>$${trip.total_amount.toFixed(2)}</td>
-        <td>${trip.trip_duration_minutes ? trip.trip_duration_minutes.toFixed(0) + ' min' : 'N/A'}</td>
+        <td>${trip.pickup_zone || 'N/A'}</td>
+        <td>${trip.dropoff_zone || 'N/A'}</td>
+        <td>${trip.pickup_borough || 'N/A'}</td>
+        <td>${formatNum(trip.trip_distance, 2)} mi</td>
+        <td>$${formatNum(trip.fare_amount, 2)}</td>
+        <td>$${formatNum(trip.total_amount, 2)}</td>
+        <td>${trip.trip_duration_minutes ? formatNum(trip.trip_duration_minutes, 0) + ' min' : 'N/A'}</td>
       `;
       tbody.appendChild(row);
     });
@@ -245,7 +294,12 @@ async function loadTrips(page = 1) {
     
   } catch (error) {
     console.error('Failed to load trips:', error);
-    document.getElementById('trips-tbody').innerHTML = '<tr><td colspan="8">Error loading trips</td></tr>';
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#ef4444;">
+      Error loading trips. Make sure the backend is running on http://localhost:5000
+      <br><small>Error: ${error.message}</small>
+    </td></tr>`;
+    document.getElementById('btn-prev').disabled = true;
+    document.getElementById('btn-next').disabled = true;
   }
 }
 
